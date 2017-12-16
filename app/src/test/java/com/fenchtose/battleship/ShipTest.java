@@ -22,7 +22,7 @@ public class ShipTest {
 	public void setup() {
 		ship = new Ship(3, new Point(1, 1), Direction.HORIZONTAL);
 		battleship = new Battleship(ship);
-		game = new BasicGameUtils(null);
+		game = new BasicGameUtils(null, false);
 	}
 
 	@Test

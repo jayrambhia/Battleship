@@ -4,9 +4,9 @@ import com.fenchtose.battleship.models.BattleBoard
 import com.fenchtose.battleship.models.Battleship
 import com.fenchtose.battleship.models.Point
 
-class Move(val offense: BattleBoard, val defense: BattleBoard, val hit: Point) {
+data class Move(val offense: BattleBoard, val defense: BattleBoard, val hit: Point) {
 
-    class Result(val hit: Point?, val defense: BattleBoard?, val events: ArrayList<Event>) {
+    data class Result(val hit: Point?, val defense: BattleBoard?, val events: ArrayList<Event>) {
 
         companion object {
             fun miss(hit: Point, defense: BattleBoard): Result {
@@ -22,13 +22,9 @@ class Move(val offense: BattleBoard, val defense: BattleBoard, val hit: Point) {
             }
         }
 
-        override fun toString(): String {
-            return "Result(hit=(${hit!!.col}, ${hit.row}), defense=${defense!!.user.name}, events=$events)"
-        }
-
     }
 
-    class Event(val hit: Point?, val defense: BattleBoard?, val ship: Battleship?, val type: EventType) {
+    data class Event(val hit: Point?, val defense: BattleBoard?, val ship: Battleship?, val type: EventType) {
         companion object {
             fun invalid(hit: Point, defense: BattleBoard): Event {
                 return Event(hit, defense, null, EventType.INVALID)
@@ -50,11 +46,6 @@ class Move(val offense: BattleBoard, val defense: BattleBoard, val hit: Point) {
                 return Event(hit, defense, null, EventType.LOST)
             }
         }
-
-        override fun toString(): String {
-            return "Event(type=$type)"
-        }
-
 
     }
 }

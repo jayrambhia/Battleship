@@ -1,6 +1,6 @@
 package com.fenchtose.battleship.models
 
-class BattleBoard(val user: User, val board: Board) {
+data class BattleBoard(val user: User, val board: Board) {
     var didUserLose: Boolean = false
     val activeShips = ArrayList<Battleship>()
     val destroyedShips = ArrayList<Battleship>()
@@ -13,10 +13,5 @@ class BattleBoard(val user: User, val board: Board) {
     init {
         activeShips.addAll(board.ships)
     }
-
-    override fun toString(): String {
-        return "BattleBoard(user=$user, board=$board, activeShips=$activeShips, destroyedShips=$destroyedShips)"
-    }
-
 
 }
