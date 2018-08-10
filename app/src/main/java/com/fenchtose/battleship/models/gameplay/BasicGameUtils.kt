@@ -19,8 +19,8 @@ class BasicGameUtils(val logger: Logger, val debug: Boolean) : GameUtils {
             return false
         }
 
-        board.board.ships.add(ship)
-        board.activeShips.add(ship)
+//        board.board.ships.add(ship)
+//        board.activeShips.add(ship)
         return true
     }
 

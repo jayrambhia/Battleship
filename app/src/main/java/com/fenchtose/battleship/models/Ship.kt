@@ -13,3 +13,8 @@ data class Ship(val size: Int, val start: Point, val direction: Direction) {
         return p in position
     }
 }
+
+data class Battleship(val ship: Ship) {
+    val hits: ArrayList<Point> = ArrayList(ship.size)
+    var destroyed: Boolean = false
+}
