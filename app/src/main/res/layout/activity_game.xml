@@ -9,9 +9,10 @@
 
 	<android.support.v7.widget.RecyclerView
 		android:id="@+id/recyclerview"
-		android:background="@color/colorAccent"
+		android:background="@color/cell_background"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"/>
+		android:layout_height="wrap_content"
+		tools:listitem="@layout/square_cell_itemview"/>
 
 	<TextView
 		android:id="@+id/gamestate_info"

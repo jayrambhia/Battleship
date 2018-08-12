@@ -3,4 +3,12 @@
 	<color name="colorPrimary">#3F51B5</color>
 	<color name="colorPrimaryDark">#303F9F</color>
 	<color name="colorAccent">#FF4081</color>
+
+	<color name="cell_background">#FF0EB1D2</color>
+	<color name="cell_border">#FF2B4141</color>
+	<color name="cell_my_ship_hit">#FFE55934</color>
+	<color name="cell_my_ship">#FFEEEBD0</color>
+	<color name="cell_ship_miss">#FFD7D9CE</color>
+	<color name="cell_ship_hit">#FF003554</color>
+	<color name="cell_opponent_miss">#FF696773</color>
 </resources>

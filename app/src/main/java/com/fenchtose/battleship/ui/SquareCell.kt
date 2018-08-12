@@ -39,31 +39,32 @@ class SquareCell: View {
 
     private fun init(context: Context) {
         val sPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        sPaint.color = Color.GREEN
+        sPaint.color = ContextCompat.getColor(context, R.color.cell_my_ship)
         sPaint.style = Paint.Style.FILL
+        sPaint.strokeCap = Paint.Cap.ROUND
 
         val hPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        hPaint.color = Color.RED
+        hPaint.color = ContextCompat.getColor(context, R.color.cell_my_ship_hit)
         hPaint.style = Paint.Style.FILL
 
         val uhPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        uhPaint.color = Color.YELLOW
+        uhPaint.color = ContextCompat.getColor(context, R.color.cell_ship_hit)
         uhPaint.style = Paint.Style.FILL
 
         val omPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        omPaint.color = Color.GRAY
+        omPaint.color = ContextCompat.getColor(context, R.color.cell_opponent_miss)
         omPaint.style = Paint.Style.FILL
 
         val ohPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        ohPaint.color = Color.BLACK
+        ohPaint.color = ContextCompat.getColor(context, R.color.cell_ship_hit)
         ohPaint.style = Paint.Style.FILL
 
         val umPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        umPaint.color = Color.WHITE
+        umPaint.color = ContextCompat.getColor(context, R.color.cell_ship_miss)
         umPaint.style = Paint.Style.FILL
 
         val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        borderPaint.color = ContextCompat.getColor(context, R.color.colorPrimary)
+        borderPaint.color = ContextCompat.getColor(context, R.color.cell_border)
         borderPaint.style = Paint.Style.STROKE
         borderPaint.strokeWidth = 2f
 

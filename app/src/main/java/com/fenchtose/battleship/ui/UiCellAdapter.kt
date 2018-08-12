@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.fenchtose.battleship.R
 
-class UiCellAdapter(context: Context, private val onClick: ((UiCell) -> Unit)): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class UiCellAdapter(context: Context, private val onClick: ((Cell) -> Unit)): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val cells = ArrayList<UiCell>()
+    val cells = ArrayList<Cell>()
     val inflater = LayoutInflater.from(context)
 
     override fun getItemCount(): Int {
@@ -29,9 +29,9 @@ class UiCellAdapter(context: Context, private val onClick: ((UiCell) -> Unit)): 
         return cells[position].hashCode().toLong()
     }
 
-    class UiCellViewHolder(itemView: View, onClick: (UiCell) -> Unit) : RecyclerView.ViewHolder(itemView) {
+    class UiCellViewHolder(itemView: View, onClick: (Cell) -> Unit) : RecyclerView.ViewHolder(itemView) {
         private val view = itemView as SquareCell
-        private var cell: UiCell? = null
+        private var cell: Cell? = null
 
         init {
             view.setOnClickListener {
@@ -39,14 +39,14 @@ class UiCellAdapter(context: Context, private val onClick: ((UiCell) -> Unit)): 
             }
         }
 
-        fun bind(cell: UiCell) {
+        fun bind(cell: Cell) {
             this.cell = cell
             view.hasShip = cell.hasShip
-            view.isHit = cell.cell.opponentHit
+            view.isHit = cell.opponentHit
             view.shipDirection = cell.direction
-            view.userDidHit = cell.cell.userHit
-            view.userDidMiss = cell.cell.userMiss
-            view.opponentDidMiss = cell.cell.opponentMiss
+            view.userDidHit = cell.userHit
+            view.userDidMiss = cell.userMiss
+            view.opponentDidMiss = cell.opponentMiss
             view.invalidate()
         }
     }
