@@ -98,7 +98,7 @@ fun MoveMiddleware(state: GameState, action: Action, dispatch: Dispatch, next: N
         offense?.let {
             when(action) {
                 is GameAction.Move -> {
-                    if (it.hits.contains(action.point) || it.missed.contains(action.point)) {
+                    if (it.hits.contains(action.point) || it.misses.contains(action.point)) {
                         return next(state, GeneratedAction.InvalidMove(action.offense, action.defense, action.point), dispatch)
                     }
 

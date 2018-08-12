@@ -3,7 +3,6 @@ package com.fenchtose.battleship.models
 import com.fenchtose.battleship.add
 import com.fenchtose.battleship.redux.Action
 import com.fenchtose.battleship.redux.reduceChildStateNullable
-import com.fenchtose.battleship.remove
 
 data class Board(
         val id: Int,
@@ -11,14 +10,16 @@ data class Board(
         val width: Int,
         val height: Int,
         val ships: List<Ship> = listOf(),
-        val didUserLose: Boolean = false,
-        val activeShips: List<Int> = listOf(),
-        val destroyedShips: List<Int> = listOf(),
         val hits: Set<Point> = setOf(),
-        val missed: Set<Point> = setOf(),
+        val misses: Set<Point> = setOf(),
         val opponentHits: Set<Point> = setOf(),
-        val opponentMissed: Set<Point> = setOf()
+        val opponentMisses: Set<Point> = setOf()
 ) {
+
+    val activeShips = ships.filter { !it.destroyed }.map { it.id }
+    private val destroyedShips = ships.filter { it.destroyed }.map { it.id }
+    val didUserLose = ships.isNotEmpty() && activeShips.isEmpty()
+
     fun fits(ship: Ship) = ship.start in this && ship.end in this
 
     fun isOverlap(ship: Ship): Boolean {
@@ -33,6 +34,10 @@ data class Board(
 
     fun destroyedShips(): List<Ship> {
         return ships.filter { it.id in destroyedShips }
+    }
+
+    companion object {
+        fun testBoard(width: Int, height: Int) = Board(0, User("test"), width, height)
     }
 }
 
@@ -65,8 +70,8 @@ fun Board?.reduceOffense(action: Action): Board? {
     }
 
     return when(action) {
-        is AddShip -> copy(ships = ships.add(action.ship), activeShips = activeShips.add(action.ship.id))
-        is GeneratedAction.MissedMove -> copy(missed = missed.plus(action.point))
+        is AddShip -> copy(ships = ships.add(action.ship))
+        is GeneratedAction.MissedMove -> copy(misses = misses.plus(action.point))
         is GeneratedAction.DefinitiveAction -> copy(hits = hits.plus(action.point))
         else -> this
     }
@@ -79,16 +84,12 @@ fun Board?.reduceDefense(action: Action): Board? {
 
     return when(action) {
 //        is AddShip -> copy(ships = ships.add(action.ship), activeShips = activeShips.add(action.ship.id))
-        is GeneratedAction.MissedMove -> copy(opponentMissed = opponentMissed.plus(action.point))
+        is GeneratedAction.MissedMove -> copy(opponentMisses = opponentMisses.plus(action.point))
         is GeneratedAction.DefinitiveAction -> {
             val ship = ships.getById(action.ship.id)
             if (ship != null) {
                 val updated = ship.reduce(action)
-                copy(opponentHits = opponentHits.plus(action.point),
-                        ships = ships.update(updated),
-                        activeShips = if (updated.destroyed) activeShips.remove(updated.id) else activeShips,
-                        destroyedShips = if (updated.destroyed) destroyedShips.add(updated.id) else destroyedShips
-                )
+                copy(opponentHits = opponentHits.plus(action.point), ships = ships.update(updated))
             } else {
                 this
             }
@@ -128,9 +129,7 @@ fun List<Ship>.getById(id: Int): Ship? {
 
 fun Ship.reduce(action: Action): Ship {
     return when(action) {
-        is GeneratedAction.DefinitiveAction.HitMove -> copy(hits = hits.add(action.point))
-        is GeneratedAction.DefinitiveAction.DestroyShip -> copy(hits = hits.add(action.point), destroyed = true)
-        is GeneratedAction.DefinitiveAction.LostGame -> copy(hits = hits.add(action.point), destroyed = true)
+        is GeneratedAction.DefinitiveAction -> copy(hits = hits.plus(action.point))
         else -> this
     }
 }

@@ -124,7 +124,7 @@ class GameActivity : AppCompatActivity() {
         val random =  Random()
         while(true) {
             val point = Point(random.nextInt(width), random.nextInt(width))
-            if (!otherBoard.hits.contains(point) && !otherBoard.missed.contains(point)) {
+            if (!otherBoard.hits.contains(point) && !otherBoard.misses.contains(point)) {
                 dispatch?.invoke(GameAction.Move(otherBoard.id, myBoard.id, point))
                 break
             }

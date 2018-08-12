@@ -1,18 +1,8 @@
 package com.fenchtose.battleship
 
-import com.fenchtose.battleship.models.gameplay.BasicGameUtils
-import com.fenchtose.battleship.models.Direction
-import com.fenchtose.battleship.models.gameplay.GameUtils
-import com.fenchtose.battleship.models.Point
-import com.fenchtose.battleship.models.Ship
-
-import org.junit.Before
-import org.junit.Test
-
-import org.junit.Assert.assertEquals
 
 class gamesetupTest {
-    private lateinit var gameUtils: GameUtils
+    /*private lateinit var gameUtils: GameUtils
 
     @Before
     fun setup() {
@@ -96,5 +86,5 @@ class gamesetupTest {
         val s1 = Ship(3, Point(1, 3), Direction.VERTICAL)
         val s2 = Ship(3, Point(1, 1), Direction.VERTICAL)
         assertEquals(true, gameUtils.isOverlap(s1, s2))
-    }
+    }*/
 }

@@ -51,8 +51,8 @@ class BasicBoardToUiConverter(val logger: Logger?) : BoardToUiConverter {
                 cells.add(Cell(
                         point = point,
                         userHit = board.hits.contains(point),
-                        userMiss = board.missed.contains(point),
-                        opponentMiss = board.opponentMissed.contains(point),
+                        userMiss = board.misses.contains(point),
+                        opponentMiss = board.opponentMisses.contains(point),
                         opponentHit = board.opponentHits.contains(point)
                 ))
             }
