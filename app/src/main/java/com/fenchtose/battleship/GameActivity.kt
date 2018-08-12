@@ -5,81 +5,99 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.widget.TextView
 import android.widget.Toast
 import com.fenchtose.battleship.converter.BasicBoardToUiConverter
-import com.fenchtose.battleship.demo.RxGame
-import com.fenchtose.battleship.demo.SuperBasicGame
+import com.fenchtose.battleship.converter.BoardToUiConverter
 import com.fenchtose.battleship.logger.AndroidLogger
+import com.fenchtose.battleship.models.*
+import com.fenchtose.battleship.redux.Dispatch
+import com.fenchtose.battleship.redux.Unsubscribe
 import com.fenchtose.battleship.ui.UiCellAdapter
 
 class GameActivity : AppCompatActivity() {
 
-    var game: RxGame? = null
-    var adapter: UiCellAdapter? = null
+    private lateinit var adapter: UiCellAdapter
+    private lateinit var gamestateInfo: TextView
+
+    private lateinit var store: Gamestore
+    private lateinit var myBoard: Board
+    private lateinit var otherBoard: Board
+
+    private lateinit var converter: BoardToUiConverter
+    private var unsubscribe: Unsubscribe? = null
+    private var dispatch: Dispatch? = null
+
+    private var gameOver: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
+        gamestateInfo = findViewById(R.id.gamestate_info)
+
         val recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
-        val adapter = UiCellAdapter(this)
+        adapter = UiCellAdapter(this, {
+            if (gameOver) {
+                return@UiCellAdapter
+            }
+            dispatch?.invoke(GameAction.Move(myBoard.id, otherBoard.id, it.cell.point))
+        })
+
         adapter.setHasStableIds(true)
 
         val logger = AndroidLogger()
-        val converter = BasicBoardToUiConverter(logger)
+        converter = BasicBoardToUiConverter(logger)
 
-//        val game = SuperBasicGame(Handler(), object: SuperBasicGame.MoveCallback {
-//            override fun onMovePlayed(gmae: SuperBasicGame) {
-//                adapter.cells.clear()
-//                adapter.cells.addAll(converter.convert(gmae.board1))
-//                adapter.notifyDataSetChanged()
-//            }
-//
-//            override fun onGameEnd() {
-//                Toast.makeText(applicationContext, "Game end", Toast.LENGTH_SHORT).show()
-//            }
-//        })
-        val game = RxGame()
-        adapter.cells.addAll(game.setupShips().cells)
-
-        recyclerview.layoutManager = GridLayoutManager(this, game.width)
+        recyclerview.layoutManager = GridLayoutManager(this, 10)
         recyclerview.adapter = adapter
         adapter.notifyDataSetChanged()
 
-        this.game = game
-        this.adapter = adapter
 
-//        val game = DemoGame()
-//        game.setupShips()
-//        game.showBoards()
-//        game.play()
+        myBoard = Board(0, User("Player 1"), 10, 10)
+        otherBoard = Board(1, User("Player 2"), 10, 10)
 
+        val initState = GameState(
+                board1 = myBoard,
+                board2 = otherBoard,
+                lastPlayed = otherBoard.id
+        )
 
+        store = Gamestore(initState)
+        setupGame()
     }
 
     override fun onResume() {
         super.onResume()
-        game?.let {
-            it.play()
-                    .doOnNext {
-                        if (it.over) {
-                            Toast.makeText(baseContext, "Game over!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    .subscribe {
-                        val state = it
-                        adapter?.let {
-                            it.cells.clear()
-                            it.cells.addAll(state.cells)
-                            it.notifyDataSetChanged()
-                        }
-                    }
-        }
+        unsubscribe = store.subscribe({ state, dispatch ->
+            this.dispatch = dispatch
+            myBoard = state.board1
+            otherBoard = state.board2
+            val cells = converter.convert(myBoard)
+            adapter.cells.clear()
+            adapter.cells.addAll(cells)
+            adapter.notifyDataSetChanged()
+
+            gamestateInfo.text = if (state.lastPlayed == otherBoard.id) "Your turn" else "Player 2 turn"
+            gameOver = state.gameOver
+
+            if (state.gameOver) {
+                gamestateInfo.text = "Game over!"
+            }
+
+        })
 
     }
 
     override fun onPause() {
         super.onPause()
-        game?.pause()
+        unsubscribe?.invoke()
+    }
+
+    private fun setupGame() {
+        for (i in 1..5) {
+            store.dispatch(AddShip(myBoard.id, Ship(i, i, Point(i, i), (if (i%2 == 0) Direction.HORIZONTAL else Direction.VERTICAL ))))
+            store.dispatch(AddShip(otherBoard.id, Ship(10 + i, i, Point(i, i), (if (i%2 == 0) Direction.HORIZONTAL else Direction.VERTICAL ))))
+        }
     }
 }

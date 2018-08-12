@@ -1,6 +1,9 @@
 package com.fenchtose.battleship.models
 
-data class Ship(val size: Int, val start: Point, val direction: Direction) {
+data class Ship(
+        val id: Int,
+        val size: Int, val start: Point, val direction: Direction,
+        val hits: List<Point> = listOf(), val destroyed: Boolean = false) {
     val position = Position(start, direction, size)
     val end = position.end
 
@@ -12,9 +15,4 @@ data class Ship(val size: Int, val start: Point, val direction: Direction) {
     operator fun contains(p: Point): Boolean {
         return p in position
     }
-}
-
-data class Battleship(val ship: Ship) {
-    val hits: ArrayList<Point> = ArrayList(ship.size)
-    var destroyed: Boolean = false
 }

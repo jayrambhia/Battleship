@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.fenchtose.battleship.R
 
-class UiCellAdapter(context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class UiCellAdapter(context: Context, private val onClick: ((UiCell) -> Unit)): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val cells = ArrayList<UiCell>()
     val inflater = LayoutInflater.from(context)
@@ -17,7 +17,7 @@ class UiCellAdapter(context: Context): RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return UiCellViewHolder(inflater.inflate(R.layout.square_cell_itemview, parent, false))
+        return UiCellViewHolder(inflater.inflate(R.layout.square_cell_itemview, parent, false), onClick)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -29,10 +29,18 @@ class UiCellAdapter(context: Context): RecyclerView.Adapter<RecyclerView.ViewHol
         return cells[position].hashCode().toLong()
     }
 
-    class UiCellViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val view = itemView as SquareCell
+    class UiCellViewHolder(itemView: View, onClick: (UiCell) -> Unit) : RecyclerView.ViewHolder(itemView) {
+        private val view = itemView as SquareCell
+        private var cell: UiCell? = null
+
+        init {
+            view.setOnClickListener {
+                cell?.let(onClick)
+            }
+        }
 
         fun bind(cell: UiCell) {
+            this.cell = cell
             view.hasShip = cell.hasShip
             view.isHit = cell.cell.opponentHit
             view.shipDirection = cell.direction
