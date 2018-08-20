@@ -51,34 +51,6 @@ class ModelTests {
         assertTrue(Point(3, 2) !in ship1)
     }
 
-/*    @Test
-    fun checkBasicGameUtils() {
-        val b = Board(1, User("test"), 8, 6)
-        val ships = arrayListOf(
-                Ship(1,3, Point(3,3), Direction.VERTICAL),
-                Ship(2,4, Point(3, 3), Direction.VERTICAL),
-                Ship(3,4, Point(3, 4), Direction.HORIZONTAL),
-                Ship(4,1, Point(1, 2), Direction.VERTICAL),
-                Ship(5,1, Point(3, 2), Direction.HORIZONTAL),
-                Ship(6,1, Point(1, 2), Direction.VERTICAL),
-                Ship(7,2, Point(3, 2), Direction.HORIZONTAL),
-                Ship(8,3, Point(1, 2), Direction.VERTICAL),
-                Ship(9,4, Point(5, 6), Direction.HORIZONTAL),
-                Ship(10,2, Point(2, 4), Direction.VERTICAL),
-                Ship(11,3, Point(3, 4), Direction.HORIZONTAL),
-                Ship(12,1, Point(6, 2), Direction.VERTICAL),
-                Ship(13,2, Point(5, 1), Direction.HORIZONTAL),
-                Ship(14,3, Point(5, 1), Direction.VERTICAL),
-                Ship(15,4, Point(5, 2), Direction.HORIZONTAL)
-                )
-
-        for (i in 1..ships.size) {
-            for (j in 1..ships.size) {
-//                assertEquals("${i-1}, ${j-1}", ships[i-1] in ships[j-1], BasicGameUtils.checkOverlap(ships[i-1], ships[j-1]))
-            }
-        }
-    }*/
-
     @Test
     fun pointOnBoard() {
         val b = testBoard(8, 6)
