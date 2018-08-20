@@ -5,14 +5,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.widget.TextView
-import com.fenchtose.battleship.converter.BasicBoardToUiConverter
-import com.fenchtose.battleship.converter.BoardToUiConverter
-import com.fenchtose.battleship.logger.AndroidLogger
 import com.fenchtose.battleship.models.*
 import com.fenchtose.battleship.redux.Dispatch
 import com.fenchtose.battleship.redux.Unsubscribe
+import com.fenchtose.battleship.ui.Cell
 import com.fenchtose.battleship.ui.UiCellAdapter
 import java.util.*
 
@@ -27,7 +24,6 @@ class GameActivity : AppCompatActivity() {
     private lateinit var myBoard: Board
     private lateinit var otherBoard: Board
 
-    private lateinit var converter: BoardToUiConverter
     private var unsubscribe: Unsubscribe? = null
     private var dispatch: Dispatch? = null
 
@@ -48,13 +44,10 @@ class GameActivity : AppCompatActivity() {
             if (gameOver) {
                 return@UiCellAdapter
             }
-            dispatch?.invoke(GameAction.Move(myBoard.id, otherBoard.id, it.point))
+            dispatch?.invoke(Move(myBoard.id, otherBoard.id, it.point))
         })
 
         adapter.setHasStableIds(true)
-
-        val logger = AndroidLogger()
-        converter = BasicBoardToUiConverter(logger)
 
         recyclerview.layoutManager = GridLayoutManager(this, width)
         recyclerview.adapter = adapter
@@ -81,11 +74,7 @@ class GameActivity : AppCompatActivity() {
             myBoard = state.board1
             otherBoard = state.board2
 
-            val start = System.currentTimeMillis()
-            val cells = converter.convert(myBoard)
-            val end = System.currentTimeMillis()
-
-            Log.d("Render", "time to convert to cells: ${end-start} ms")
+            val cells = generateCells(myBoard)
 
             adapter.cells.clear()
             adapter.cells.addAll(cells)
@@ -124,10 +113,30 @@ class GameActivity : AppCompatActivity() {
         val random =  Random()
         while(true) {
             val point = Point(random.nextInt(width), random.nextInt(width))
-            if (!otherBoard.hits.contains(point) && !otherBoard.misses.contains(point)) {
-                dispatch?.invoke(GameAction.Move(otherBoard.id, myBoard.id, point))
+            if (point !in otherBoard.hits && point !in otherBoard.misses) {
+                dispatch?.invoke(Move(otherBoard.id, myBoard.id, point))
                 break
             }
         }
+    }
+
+    private fun generateCells(board: Board): ArrayList<Cell> {
+        val cells = ArrayList<Cell>(board.width * board.height)
+        for (i in 0 until board.height) {
+            for (j in 0 until board.width) {
+                val point = Point(j, i)
+                cells.add(Cell(
+                        point = point,
+                        hasShip = board.ships.contains(point),
+                        direction = board.ships.getShipDirection(point),
+                        userHit = board.hits.contains(point),
+                        userMissed = board.misses.contains(point),
+                        opponentMissed = board.opponentMisses.contains(point),
+                        opponentHit = board.opponentHits.contains(point)
+                ))
+            }
+        }
+
+        return cells
     }
 }

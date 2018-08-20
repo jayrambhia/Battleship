@@ -1,5 +1,7 @@
 package com.fenchtose.battleship.models
 
+import com.fenchtose.battleship.redux.Action
+
 data class Ship(
         val id: Int,
         val size: Int, val start: Point, val direction: Direction,
@@ -28,4 +30,60 @@ data class Ship(
         }
     }
 
+}
+
+fun List<Ship>.contains(p: Point): Boolean {
+    forEach {
+        if (p in it) {
+            return true
+        }
+    }
+
+    return false
+}
+
+fun List<Ship>.getShipDirection(p: Point): Direction? {
+    forEach {
+        if (p in it) {
+            return it.direction
+        }
+    }
+
+    return null
+}
+
+fun List<Ship>.update(ship: Ship): List<Ship> {
+    var index = -1
+    forEachIndexed { i, s ->
+        if (s.id == ship.id) {
+            index = i
+            return@forEachIndexed
+        }
+    }
+
+    if (index != -1) {
+        val mutable = ArrayList(this)
+        mutable.removeAt(index)
+        mutable.add(index, ship)
+        return mutable
+    }
+
+    return this
+}
+
+fun List<Ship>.getById(id: Int): Ship? {
+    forEach {
+        if (id == it.id) {
+            return it
+        }
+    }
+
+    return null
+}
+
+fun Ship.reduce(action: Action): Ship {
+    return when(action) {
+        is GeneratedAction.DefinitiveAction -> copy(hits = hits.plus(action.point))
+        else -> this
+    }
 }

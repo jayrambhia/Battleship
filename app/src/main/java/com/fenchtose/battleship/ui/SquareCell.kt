@@ -2,9 +2,9 @@ package com.fenchtose.battleship.ui
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.support.annotation.ColorRes
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
@@ -13,72 +13,36 @@ import com.fenchtose.battleship.models.Direction
 
 class SquareCell: View {
 
-    var hasShip: Boolean = false
-    var shipDirection: Direction? = null
-    var isHit: Boolean = false
-    var opponentDidMiss: Boolean = false
-    var userDidHit: Boolean = false
-    var userDidMiss: Boolean = false
+    private var cell: Cell? = null
 
-    var sPaint: Paint? = null
-    var hPaint: Paint? = null
-    var uhPaint: Paint? = null
-    var umPaint: Paint? = null
-    var ohPaint: Paint? = null
-    var omPaint: Paint? = null
+    private val shipPaint: Paint
+    private val shipHitPaint: Paint
+    private val hitPaint: Paint
+    private val missedPaint: Paint
+    private val opponentHitPaint: Paint
+    private val opponentMissedPaint: Paint
+    private val borderPaint: Paint
 
-    var borderPaint: Paint? = null
-
-    val rect: Rect = Rect()
+    private val rect: Rect = Rect()
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        init(context)
+        shipPaint = initPaint(R.color.cell_my_ship, cap = Paint.Cap.ROUND)
+        shipHitPaint = initPaint(R.color.cell_my_ship_hit)
+        hitPaint = initPaint(R.color.cell_ship_hit)
+        opponentMissedPaint = initPaint(R.color.cell_opponent_miss)
+        opponentHitPaint = initPaint(R.color.cell_ship_hit)
+        missedPaint = initPaint(R.color.cell_ship_miss)
+        borderPaint = initPaint(R.color.cell_border, Paint.Style.STROKE, 2f)
     }
 
-    private fun init(context: Context) {
-        val sPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        sPaint.color = ContextCompat.getColor(context, R.color.cell_my_ship)
-        sPaint.style = Paint.Style.FILL
-        sPaint.strokeCap = Paint.Cap.ROUND
-
-        val hPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        hPaint.color = ContextCompat.getColor(context, R.color.cell_my_ship_hit)
-        hPaint.style = Paint.Style.FILL
-
-        val uhPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        uhPaint.color = ContextCompat.getColor(context, R.color.cell_ship_hit)
-        uhPaint.style = Paint.Style.FILL
-
-        val omPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        omPaint.color = ContextCompat.getColor(context, R.color.cell_opponent_miss)
-        omPaint.style = Paint.Style.FILL
-
-        val ohPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        ohPaint.color = ContextCompat.getColor(context, R.color.cell_ship_hit)
-        ohPaint.style = Paint.Style.FILL
-
-        val umPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        umPaint.color = ContextCompat.getColor(context, R.color.cell_ship_miss)
-        umPaint.style = Paint.Style.FILL
-
-        val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        borderPaint.color = ContextCompat.getColor(context, R.color.cell_border)
-        borderPaint.style = Paint.Style.STROKE
-        borderPaint.strokeWidth = 2f
-
-        this.sPaint = sPaint
-        this.hPaint = hPaint
-        this.uhPaint = uhPaint
-        this.umPaint = umPaint
-        this.ohPaint = ohPaint
-        this.omPaint = omPaint
-        this.borderPaint = borderPaint
-
-        if (isInEditMode) {
-            hasShip = true
-            shipDirection = Direction.HORIZONTAL
+    private fun initPaint(@ColorRes color: Int, style: Paint.Style = Paint.Style.FILL, width: Float? = null, cap: Paint.Cap? = null): Paint {
+        return Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = ContextCompat.getColor(context, color)
+            this.style = style
+            width?.let { this.strokeWidth = it }
+            cap?.let { this.strokeCap = it }
         }
     }
 
@@ -94,33 +58,41 @@ class SquareCell: View {
         rect.right = canvas.width
 
         canvas.drawRect(rect, borderPaint)
+        cell?.apply {
+            if (hasShip && direction != null) {
+                when (direction) {
+                    Direction.HORIZONTAL -> {
+                        rect.bottom = canvas.height - 64
+                        rect.right = canvas.width
+                    }
 
-        if (hasShip && shipDirection != null) {
-            when (shipDirection) {
-                Direction.HORIZONTAL -> {
-                    rect.bottom = canvas.height - 64
-                    rect.right = canvas.width
+                    Direction.VERTICAL -> {
+                        rect.bottom = canvas.height
+                        rect.right = canvas.width - 64
+                    }
                 }
-
-                Direction.VERTICAL -> {
-                    rect.bottom = canvas.height
-                    rect.right = canvas.width - 64
-                }
+                val paint = if (!opponentHit) shipPaint else shipHitPaint
+                canvas.drawRect(rect, paint)
             }
-            val paint = if (!isHit) sPaint else hPaint
-            canvas.drawRect(rect, paint)
+
+            if (userHit) {
+                canvas.drawCircle((canvas.width - 24).toFloat(), (canvas.height - 24).toFloat(), 16f, hitPaint)
+            } else if (userMissed) {
+                canvas.drawCircle((canvas.width - 24).toFloat(), (canvas.height - 24).toFloat(), 16f, missedPaint)
+            }
+
+            if (opponentHit) {
+                canvas.drawCircle(24f, 24f, 16f, opponentHitPaint)
+            } else if (opponentMissed) {
+                canvas.drawCircle(24f, 24f, 16f, opponentMissedPaint)
+            }
         }
 
-        if (userDidHit) {
-            canvas.drawCircle((canvas.width - 24).toFloat(), (canvas.height - 24).toFloat(), 16f, uhPaint)
-        } else if (userDidMiss) {
-            canvas.drawCircle((canvas.width - 24).toFloat(), (canvas.height - 24).toFloat(), 16f, umPaint)
-        }
 
-        if (isHit) {
-            canvas.drawCircle(24f, 24f, 16f, ohPaint)
-        } else if (opponentDidMiss) {
-            canvas.drawCircle(24f, 24f, 16f, omPaint)
-        }
+    }
+
+    fun bind(cell: Cell) {
+        this.cell = cell
+        invalidate()
     }
 }

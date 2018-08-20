@@ -10,7 +10,7 @@ import com.fenchtose.battleship.R
 class UiCellAdapter(context: Context, private val onClick: ((Cell) -> Unit)): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val cells = ArrayList<Cell>()
-    val inflater = LayoutInflater.from(context)
+    private val inflater = LayoutInflater.from(context)
 
     override fun getItemCount(): Int {
         return cells.size
@@ -41,13 +41,7 @@ class UiCellAdapter(context: Context, private val onClick: ((Cell) -> Unit)): Re
 
         fun bind(cell: Cell) {
             this.cell = cell
-            view.hasShip = cell.hasShip
-            view.isHit = cell.opponentHit
-            view.shipDirection = cell.direction
-            view.userDidHit = cell.userHit
-            view.userDidMiss = cell.userMiss
-            view.opponentDidMiss = cell.opponentMiss
-            view.invalidate()
+            view.bind(cell)
         }
     }
 }

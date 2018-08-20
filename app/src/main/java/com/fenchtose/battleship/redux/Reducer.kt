@@ -16,18 +16,3 @@ fun<State, Child> reduceChildState(
 
     return onReduced(state, reduced)
 }
-
-fun <State, Child> reduceChildStateNullable(
-        state: State,
-        child: Child?,
-        action: Action,
-        reducer: Reducer<Child?>,
-        onReduced: (State, Child?) -> State): State {
-
-    val reduced = reducer.invoke(child, action)
-    if (reduced === child) {
-        return state
-    }
-
-    return onReduced(state, reduced)
-}
